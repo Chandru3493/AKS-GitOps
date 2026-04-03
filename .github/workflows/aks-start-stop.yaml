@@ -26,9 +26,9 @@ jobs:
       - name: Azure Login using Managed Identity
         uses: azure/login@v2
         with:
-          client-id: 95365ea5-f63e-4f1b-b79d-e7d6f91e940d
-          tenant-id: cd5dbd24-330a-4174-8e00-dc550f63976b
-          subscription-id: 00fdca96-ec79-44da-9185-06c1c4ea957f
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Start AKS Cluster
         if: ${{ github.event.inputs.action == 'start' }}
