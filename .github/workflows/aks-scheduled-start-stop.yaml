@@ -10,6 +10,7 @@ permissions:
   contents: read
 
 env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   RESOURCE_GROUP: AVA-EUS-DATABRICKS-RG
   CLUSTER_NAME: ava-eus-dbw-cluster
 
