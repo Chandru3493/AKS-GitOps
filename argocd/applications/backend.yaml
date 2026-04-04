@@ -4,8 +4,8 @@ metadata:
   name: backend
   namespace: argocd
   annotations:
-    argocd-image-updater.argoproj.io/image-list: backend=avaeusdbwacr.azurecr.io/backend
-    argocd-image-updater.argoproj.io/backend.update-strategy: latest
+    argocd-image-updater.argoproj.io/image-list: backend=avaeusdbwacr.azurecr.io/backend:latest
+    argocd-image-updater.argoproj.io/backend.update-strategy: digest
     argocd-image-updater.argoproj.io/backend.pull-secret: pullsecret:argocd/acr-secret
     argocd-image-updater.argoproj.io/write-back-method: argocd
   finalizers:

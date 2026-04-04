@@ -4,8 +4,8 @@ metadata:
   name: frontend
   namespace: argocd
   annotations:
-    argocd-image-updater.argoproj.io/image-list: frontend=avaeusdbwacr.azurecr.io/frontend
-    argocd-image-updater.argoproj.io/frontend.update-strategy: latest
+    argocd-image-updater.argoproj.io/image-list: frontend=avaeusdbwacr.azurecr.io/frontend:latest
+    argocd-image-updater.argoproj.io/frontend.update-strategy: digest
     argocd-image-updater.argoproj.io/frontend.pull-secret: pullsecret:argocd/acr-secret
     argocd-image-updater.argoproj.io/write-back-method: argocd
   finalizers:
