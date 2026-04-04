@@ -1,36 +1,31 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: frontend
+  name: todo-app
   labels:
-    app: frontend
-    tier: frontend
+    app: todo-app
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: frontend
+      app: todo-app
   template:
     metadata:
       labels:
-        app: frontend
-        tier: frontend
+        app: todo-app
     spec:
       containers:
-        - name: frontend
-          image: avaeusdbwacr.azurecr.io/frontend:latest
+        - name: todo-app
+          image: avaeusdbwacr.azurecr.io/todo-app:latest
           ports:
             - containerPort: 80
-          env:
-            - name: BACKEND_URL
-              value: "http://backend.backend.svc.cluster.local:8080"
           resources:
             requests:
               cpu: 100m
-              memory: 128Mi
+              memory: 64Mi
             limits:
               cpu: 250m
-              memory: 256Mi
+              memory: 128Mi
           readinessProbe:
             httpGet:
               path: /

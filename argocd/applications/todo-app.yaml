@@ -1,12 +1,12 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: frontend
+  name: todo-app
   namespace: argocd
   annotations:
-    argocd-image-updater.argoproj.io/image-list: frontend=avaeusdbwacr.azurecr.io/frontend:latest
-    argocd-image-updater.argoproj.io/frontend.update-strategy: digest
-    argocd-image-updater.argoproj.io/frontend.pull-secret: pullsecret:argocd/acr-secret
+    argocd-image-updater.argoproj.io/image-list: app=avaeusdbwacr.azurecr.io/todo-app:latest
+    argocd-image-updater.argoproj.io/app.update-strategy: digest
+    argocd-image-updater.argoproj.io/app.pull-secret: pullsecret:argocd/acr-secret
     argocd-image-updater.argoproj.io/write-back-method: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -15,10 +15,10 @@ spec:
   source:
     repoURL: https://github.com/chandrur44/AKS-GitOps.git
     targetRevision: main
-    path: apps/frontend/overlays/prod
+    path: apps/todo-app/overlays/prod
   destination:
     server: https://kubernetes.default.svc
-    namespace: frontend
+    namespace: todo-app
   syncPolicy:
     automated:
       prune: true

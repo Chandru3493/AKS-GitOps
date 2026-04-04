@@ -1,15 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: frontend
+  name: todo-app
   labels:
-    app: frontend
-    tier: frontend
+    app: todo-app
 spec:
   selector:
-    app: frontend
+    app: todo-app
   ports:
     - name: http
       port: 80
       targetPort: 80
-  type: LoadBalancer   # Exposes frontend externally
+  type: LoadBalancer

@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: backend
+  name: todo-app
   labels:
-    app: backend
+    app: todo-app
     managed-by: argocd
