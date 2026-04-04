@@ -1,13 +1,12 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: sample-app
+  name: backend
   namespace: argocd
   annotations:
-    # Image Updater — tracks latest image tag from ACR
-    argocd-image-updater.argoproj.io/image-list: app=avaeusdbwacr.azurecr.io/sample-app
-    argocd-image-updater.argoproj.io/app.update-strategy: latest
-    argocd-image-updater.argoproj.io/app.pull-secret: pullsecret:argocd/acr-secret
+    argocd-image-updater.argoproj.io/image-list: backend=avaeusdbwacr.azurecr.io/backend
+    argocd-image-updater.argoproj.io/backend.update-strategy: latest
+    argocd-image-updater.argoproj.io/backend.pull-secret: pullsecret:argocd/acr-secret
     argocd-image-updater.argoproj.io/write-back-method: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -16,14 +15,14 @@ spec:
   source:
     repoURL: https://github.com/chandrur44/AKS-GitOps.git
     targetRevision: main
-    path: apps/sample-app/overlays/prod
+    path: apps/backend/overlays/prod
   destination:
     server: https://kubernetes.default.svc
-    namespace: sample-app
+    namespace: backend
   syncPolicy:
     automated:
-      prune: true       # Delete resources removed from Git
-      selfHeal: true    # Revert manual cluster changes
+      prune: true
+      selfHeal: true
     syncOptions:
       - CreateNamespace=true
       - PrunePropagationPolicy=foreground
