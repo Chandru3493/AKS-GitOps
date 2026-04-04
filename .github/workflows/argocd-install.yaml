@@ -1,0 +1,93 @@
+name: Bootstrap ArgoCD
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  CLUSTER_NAME: ava-eus-dbw-cluster
+  RESOURCE_GROUP: AVA-EUS-DATABRICKS-RG
+  ACR_NAME: avaeusdbwacr
+  ARGOCD_VERSION: v2.14.5
+  IMAGE_UPDATER_VERSION: v0.15.0
+
+jobs:
+  bootstrap:
+    name: Bootstrap ArgoCD on AKS
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Get AKS Credentials
+        run: |
+          az aks get-credentials \
+            --name ${{ env.CLUSTER_NAME }} \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --overwrite-existing
+
+      # ── Install ArgoCD ────────────────────────────────────────────────
+      - name: Install ArgoCD
+        run: |
+          kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
+          kubectl apply -n argocd \
+            -f https://raw.githubusercontent.com/argoproj/argo-cd/${{ env.ARGOCD_VERSION }}/manifests/install.yaml
+          echo "Waiting for ArgoCD to be ready..."
+          kubectl rollout status deployment/argocd-server -n argocd --timeout=300s
+          kubectl rollout status deployment/argocd-repo-server -n argocd --timeout=300s
+          kubectl rollout status deployment/argocd-application-controller -n argocd --timeout=300s
+
+      # ── Install ArgoCD Image Updater ──────────────────────────────────
+      - name: Install ArgoCD Image Updater
+        run: |
+          kubectl apply -n argocd \
+            -f https://raw.githubusercontent.com/argoproj-labs/argocd-image-updater/${{ env.IMAGE_UPDATER_VERSION }}/manifests/install.yaml
+          echo "Waiting for Image Updater to be ready..."
+          kubectl rollout status deployment/argocd-image-updater -n argocd --timeout=180s
+
+      # ── Configure ACR credentials for Image Updater ──────────────────
+      # Prerequisites: Add ACR_USERNAME (var) and ACR_PASSWORD (secret) to this repo.
+      # In Azure Portal → ACR → Access keys → enable Admin user to get credentials.
+      # Or create a scoped token: az acr token create --name argocd-image-updater
+      #   --registry avaeusdbwacr --scope-map _repositories_pull
+      - name: Configure ACR Credentials
+        run: |
+          kubectl create secret docker-registry acr-secret \
+            --namespace argocd \
+            --docker-server=${{ env.ACR_NAME }}.azurecr.io \
+            --docker-username=${{ vars.ACR_USERNAME }} \
+            --docker-password=${{ secrets.ACR_PASSWORD }} \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      # ── Apply Image Updater registry config ───────────────────────────
+      - name: Apply Image Updater Config
+        run: |
+          kubectl apply -f argocd/image-updater-config.yaml
+
+      # ── Apply App-of-Apps ─────────────────────────────────────────────
+      - name: Apply App of Apps
+        run: |
+          kubectl apply -f argocd/app-of-apps.yaml
+          echo "ArgoCD will now reconcile all apps from argocd/applications/"
+
+      # ── Retrieve initial admin password ───────────────────────────────
+      - name: Get ArgoCD Admin Password
+        run: |
+          echo "ArgoCD initial admin password:"
+          kubectl get secret argocd-initial-admin-secret \
+            -n argocd \
+            -o jsonpath="{.data.password}" | base64 -d && echo
+          echo ""
+          echo "Access ArgoCD UI by running:"
+          echo "  kubectl port-forward svc/argocd-server -n argocd 8080:443"

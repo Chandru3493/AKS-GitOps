@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-image-updater-config
+  namespace: argocd
+data:
+  registries.conf: |
+    registries:
+      - name: Azure Container Registry
+        api_url: https://avaeusdbwacr.azurecr.io
+        prefix: avaeusdbwacr.azurecr.io
+        credentials: pullsecret:argocd/acr-secret
+        default: true
+  # Poll interval for checking new images (default: 2m)
+  interval: 2m
+  # Log level
+  log.level: info
