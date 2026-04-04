@@ -46,7 +46,7 @@ jobs:
           echo "Waiting for ArgoCD to be ready..."
           kubectl rollout status deployment/argocd-server -n argocd --timeout=300s
           kubectl rollout status deployment/argocd-repo-server -n argocd --timeout=300s
-          kubectl rollout status deployment/argocd-application-controller -n argocd --timeout=300s
+          kubectl rollout status statefulset/argocd-application-controller -n argocd --timeout=300s
 
       # ── Install ArgoCD Image Updater ──────────────────────────────────
       - name: Install ArgoCD Image Updater
