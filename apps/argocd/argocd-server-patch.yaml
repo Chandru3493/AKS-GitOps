@@ -11,3 +11,4 @@ spec:
             - argocd-server
             - --insecure
             - --basehref=/argocd/
+          args: []
