@@ -4,13 +4,15 @@ metadata:
   name: todo-app
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   ingressClassName: nginx
   rules:
     - http:
         paths:
-          - path: /
-            pathType: Prefix
+          - path: /todo(/|$)(.*)
+            pathType: ImplementationSpecific
             backend:
               service:
                 name: todo-app
