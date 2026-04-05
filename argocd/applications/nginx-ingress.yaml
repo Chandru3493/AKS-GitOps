@@ -15,10 +15,14 @@ spec:
       values: |
         controller:
           replicaCount: 1
+          config:
+            server-snippet: |
+              location = /healthz {
+                return 200;
+              }
           service:
             annotations:
               service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /healthz
-              service.beta.kubernetes.io/azure-load-balancer-health-probe-port: "10254"
   destination:
     server: https://kubernetes.default.svc
     namespace: ingress-nginx
