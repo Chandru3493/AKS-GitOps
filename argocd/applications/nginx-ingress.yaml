@@ -20,6 +20,7 @@ spec:
               location = /healthz {
                 return 200;
               }
+              rewrite ^/argocd/argocd(/.*)$ /argocd$1 redirect;
           service:
             annotations:
               service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /healthz
