@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: prometheus-ingress
+  namespace: argocd
+  labels:
+    app.kubernetes.io/instance: app-of-apps
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/chandrur44/AKS-GitOps.git
+    targetRevision: main
+    path: apps/prometheus
+    directory:
+      include: "ingress.yaml"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=false
