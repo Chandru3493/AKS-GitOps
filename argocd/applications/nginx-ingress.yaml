@@ -16,12 +16,10 @@ spec:
         controller:
           replicaCount: 1
           config:
+            allow-snippet-annotations: "true"
             server-snippet: |
               location = /healthz {
                 return 200;
-              }
-              location ~* ^/argocd/argocd(/.*)?$ {
-                return 301 /argocd$1;
               }
           service:
             annotations:
