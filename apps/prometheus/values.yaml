@@ -1,7 +1,7 @@
 prometheus:
   prometheusSpec:
     retention: 3d
-    routePrefix: /
+    routePrefix: /prometheus
     resources:
       requests:
         cpu: 200m
@@ -16,7 +16,7 @@ grafana:
   grafana.ini:
     server:
       serve_from_sub_path: true
-      root_url: "%(protocol)s://%(domain)s/grafana"
+      root_url: "%(protocol)s://%(domain)s/grafana/"
 
 alertmanager:
   enabled: false
