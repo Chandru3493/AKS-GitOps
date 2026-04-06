@@ -2,8 +2,14 @@ name: AKS Scheduled Start/Stop
 
 on:
   schedule:
-    - cron: "30 20 * * *" # 2:00 AM IST - Stop cluster
-    - cron: "30 2 * * *"  # 8:00 AM IST - Start cluster
+    - cron: "30 19 * * *" #  1:00 AM IST - Stop cluster
+    - cron: "30 22 * * *" #  4:00 AM IST - Stop cluster
+    - cron: "30 0 * * *"  #  6:00 AM IST - Stop cluster
+    - cron: "30 4 * * *"  # 10:00 AM IST - Stop cluster
+    - cron: "30 6 * * *"  # 12:00 PM IST - Stop cluster
+    - cron: "30 8 * * *"  #  2:00 PM IST - Stop cluster
+    - cron: "30 11 * * *" #  5:00 PM IST - Stop cluster
+    - cron: "30 14 * * *" #  8:00 PM IST - Stop cluster
 
 permissions:
   id-token: write
@@ -16,7 +22,6 @@ env:
 
 jobs:
   stop-cluster:
-    if: github.event.schedule == '30 20 * * *'
     runs-on: ubuntu-latest
     steps:
       - name: Azure Login
@@ -42,33 +47,4 @@ jobs:
             echo "Cluster stopped successfully."
           else
             echo "Cluster is already stopped. Skipping."
-          fi
-
-  start-cluster:
-    if: github.event.schedule == '30 2 * * *'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Azure Login
-        uses: azure/login@v2
-        with:
-          client-id: ${{ vars.AZURE_CLIENT_ID }}
-          tenant-id: ${{ vars.AZURE_TENANT_ID }}
-          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-
-      - name: Check and Start AKS Cluster
-        run: |
-          STATE=$(az aks show \
-            --resource-group ${{ env.RESOURCE_GROUP }} \
-            --name ${{ env.CLUSTER_NAME }} \
-            --query "powerState.code" -o tsv)
-          echo "Current cluster state: $STATE"
-
-          if [ "$STATE" == "Stopped" ]; then
-            echo "Starting AKS cluster..."
-            az aks start \
-              --resource-group ${{ env.RESOURCE_GROUP }} \
-              --name ${{ env.CLUSTER_NAME }}
-            echo "Cluster started successfully."
-          else
-            echo "Cluster is already running. Skipping."
           fi
