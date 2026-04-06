@@ -16,13 +16,10 @@ spec:
         controller:
           replicaCount: 1
           config:
-            allow-snippet-annotations: "true"
             server-snippet: |
               location = /healthz {
                 return 200;
               }
-              sub_filter '<base href="/">' '<base href="/argocd/"><script>(function(){var p=history.pushState,r=history.replaceState,f=function(u){return typeof u==="string"?u.replace(/\/argocd\/argocd\//g,"/argocd/"):u};history.pushState=function(s,t,u){return p.call(this,s,t,f(u))};history.replaceState=function(s,t,u){return r.call(this,s,t,f(u))}})();</script>';
-              sub_filter_once on;
           service:
             annotations:
               service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /healthz
