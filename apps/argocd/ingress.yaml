@@ -5,16 +5,18 @@ metadata:
   namespace: argocd
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_set_header Accept-Encoding "";
+      sub_filter '<base href="/argocd/">' '<base href="/argocd/"><script>(function(){var p=history.pushState,r=history.replaceState,f=function(u){return typeof u==="string"?u.replace(/\/argocd\/argocd\//g,"/argocd/"):u};history.pushState=function(s,t,u){return p.call(this,s,t,f(u))};history.replaceState=function(s,t,u){return r.call(this,s,t,f(u))}})();</script>';
+      sub_filter_once on;
 spec:
   ingressClassName: nginx
   rules:
     - http:
         paths:
-          - path: /argocd(/|$)(.*)
-            pathType: ImplementationSpecific
+          - path: /argocd
+            pathType: Prefix
             backend:
               service:
                 name: argocd-server
