@@ -15,8 +15,9 @@ spec:
     server: https://kubernetes.default.svc
     namespace: argocd
   syncPolicy:
+  
     automated:
-      prune: true       # Remove apps deleted from argocd/applications/
-      selfHeal: true    # Revert manual changes in the cluster
+      prune: true # Remove apps deleted from argocd/applications/
+      selfHeal: true # Revert manual changes in the cluster
     syncOptions:
       - CreateNamespace=true
