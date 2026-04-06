@@ -6,10 +6,6 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
     nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      if ($request_uri ~* "^/argocd/argocd") {
-        rewrite ^/argocd/argocd(/.*)?$ /argocd$1 redirect;
-      }
 spec:
   ingressClassName: nginx
   rules:

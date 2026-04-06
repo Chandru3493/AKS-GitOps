@@ -12,7 +12,7 @@ env:
   CLUSTER_NAME: ava-eus-dbw-cluster
   RESOURCE_GROUP: AVA-EUS-DATABRICKS-RG
   ACR_NAME: avaeusdbwacr
-  ARGOCD_VERSION: v2.14.5
+  ARGOCD_VERSION: v3.3.6
   IMAGE_UPDATER_VERSION: v0.15.0
 
 jobs:

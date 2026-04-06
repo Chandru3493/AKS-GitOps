@@ -16,7 +16,6 @@ spec:
         controller:
           replicaCount: 1
           config:
-            allow-snippet-annotations: "true"
             server-snippet: |
               location = /healthz {
                 return 200;
