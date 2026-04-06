@@ -1,4 +1,4 @@
-name: AKS Scheduled Start/Stop
+name: AKS Scheduled Stop
 
 on:
   schedule:
