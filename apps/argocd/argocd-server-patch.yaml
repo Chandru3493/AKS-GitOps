@@ -10,5 +10,4 @@ spec:
           command:
             - argocd-server
             - --insecure
-            - --rootpath=/argocd
           args: []
