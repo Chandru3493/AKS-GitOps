@@ -75,12 +75,6 @@ jobs:
         run: |
           kubectl apply -f argocd/image-updater-config.yaml
 
-      # ── Apply App-of-Apps ─────────────────────────────────────────────
-      - name: Apply App of Apps
-        run: |
-          kubectl apply -f argocd/app-of-apps.yaml
-          echo "ArgoCD will now reconcile all apps from argocd/applications/"
-
       # ── Retrieve initial admin password ───────────────────────────────
       - name: Get ArgoCD Admin Password
         run: |
