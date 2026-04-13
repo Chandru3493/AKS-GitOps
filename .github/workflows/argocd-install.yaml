@@ -75,11 +75,11 @@ jobs:
         run: |
           kubectl apply -f argocd/image-updater-config.yaml
 
-      # ── Bootstrap GitOps - register root application that auto-deploys everything in argocd/applications/ ──
-      - name: Bootstrap GitOps Root Application
+      # ── Apply App-of-Apps ─────────────────────────────────────────────
+      - name: Apply App of Apps
         run: |
           kubectl apply -f argocd/app-of-apps.yaml
-          echo "ArgoCD will now auto-deploy everything under argocd/applications/"
+          echo "ArgoCD will now reconcile all apps from argocd/applications/"
 
       # ── Retrieve initial admin password ───────────────────────────────
       - name: Get ArgoCD Admin Password
