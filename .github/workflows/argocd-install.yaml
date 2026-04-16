@@ -40,9 +40,16 @@ jobs:
       # ── Install ArgoCD ────────────────────────────────────────────────
       - name: Install ArgoCD
         run: |
-          kubectl create namespace argocd --dry-run=client -o yaml | kubectl apply -f -
-          kubectl apply -n argocd \
+          set -e
+          if kubectl get namespace argocd >/dev/null 2>&1; then
+            echo "Namespace argocd already exists"
+          else
+            kubectl create namespace argocd
+          fi
+
+          kubectl apply --server-side -n argocd \
             -f https://raw.githubusercontent.com/argoproj/argo-cd/${{ env.ARGOCD_VERSION }}/manifests/install.yaml
+
           echo "Waiting for ArgoCD to be ready..."
           kubectl rollout status deployment/argocd-server -n argocd --timeout=300s
           kubectl rollout status deployment/argocd-repo-server -n argocd --timeout=300s
