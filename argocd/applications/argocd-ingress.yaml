@@ -8,7 +8,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/chandrur44/AKS-GitOps.git
+    repoURL: https://github.com/Chandru3493/AKS-GitOps.git
     targetRevision: main
     path: apps/argocd
   destination:

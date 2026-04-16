@@ -14,7 +14,7 @@ spec:
       helm:
         valueFiles:
           - $values/apps/prometheus/values.yaml
-    - repoURL: https://github.com/chandrur44/AKS-GitOps.git
+    - repoURL: https://github.com/Chandru3493/AKS-GitOps.git
       targetRevision: main
       ref: values
   destination:

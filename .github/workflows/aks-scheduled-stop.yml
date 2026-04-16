@@ -1,15 +1,8 @@
-name: AKS Scheduled Stop
+name: AKS Scheduled Stop Every 2 Hours
 
 on:
   schedule:
-    - cron: "30 19 * * *" #  1:00 AM IST - Stop cluster
-    - cron: "30 22 * * *" #  4:00 AM IST - Stop cluster
-    - cron: "30 0 * * *"  #  6:00 AM IST - Stop cluster
-    - cron: "30 4 * * *"  # 10:00 AM IST - Stop cluster
-    - cron: "30 6 * * *"  # 12:00 PM IST - Stop cluster
-    - cron: "30 8 * * *"  #  2:00 PM IST - Stop cluster
-    - cron: "30 11 * * *" #  5:00 PM IST - Stop cluster
-    - cron: "30 14 * * *" #  8:00 PM IST - Stop cluster
+    - cron: "0 */2 * * *" # every 2 hours
 
 permissions:
   id-token: write
@@ -17,8 +10,8 @@ permissions:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-  RESOURCE_GROUP: AVA-EUS-DATABRICKS-RG
-  CLUSTER_NAME: ava-eus-dbw-cluster
+  RESOURCE_GROUP: cloudzen-prod-rg
+  CLUSTER_NAME: cloudzen-prod-aks
 
 jobs:
   stop-cluster:

@@ -9,9 +9,9 @@ permissions:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-  CLUSTER_NAME: ava-eus-dbw-cluster
-  RESOURCE_GROUP: AVA-EUS-DATABRICKS-RG
-  ACR_NAME: avaeusdbwacr
+  CLUSTER_NAME: cloudzen-prod-aks
+  RESOURCE_GROUP: cloudzen-prod-rg
+  ACR_NAME: cloudzen-prod-acr
   ARGOCD_VERSION: v3.3.6
   IMAGE_UPDATER_VERSION: v0.15.0
 
@@ -60,7 +60,7 @@ jobs:
       # Prerequisites: Add ACR_USERNAME (var) and ACR_PASSWORD (secret) to this repo.
       # In Azure Portal → ACR → Access keys → enable Admin user to get credentials.
       # Or create a scoped token: az acr token create --name argocd-image-updater
-      #   --registry avaeusdbwacr --scope-map _repositories_pull
+      #   --registry cloudzen-prod-acr --scope-map _repositories_pull
       - name: Configure ACR Credentials
         run: |
           kubectl create secret docker-registry acr-secret \
