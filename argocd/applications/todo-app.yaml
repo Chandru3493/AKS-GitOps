@@ -4,7 +4,7 @@ metadata:
   name: todo-app
   namespace: argocd
   annotations:
-    argocd-image-updater.argoproj.io/image-list: app=cloudzen-prod-acr.azurecr.io/todo-app:latest
+    argocd-image-updater.argoproj.io/image-list: app=cloudzenprodacr.azurecr.io/todo-app:latest
     argocd-image-updater.argoproj.io/app.update-strategy: digest
     argocd-image-updater.argoproj.io/app.pull-secret: pullsecret:argocd/acr-secret
     argocd-image-updater.argoproj.io/write-back-method: argocd

@@ -7,8 +7,8 @@ data:
   registries.conf: |
     registries:
       - name: Azure Container Registry
-        api_url: https://cloudzen-prod-acr.azurecr.io
-        prefix: cloudzen-prod-acr.azurecr.io
+        api_url: https://cloudzenprodacr.azurecr.io
+        prefix: cloudzenprodacr.azurecr.io
         credentials: pullsecret:argocd/acr-secret
         default: true
   # Poll interval for checking new images (default: 2m)

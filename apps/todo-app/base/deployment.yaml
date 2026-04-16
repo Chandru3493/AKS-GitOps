@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: todo-app
-          image: cloudzen-prod-acr.azurecr.io/todo-app:latest
+          image: cloudzenprodacr.azurecr.io/todo-app:latest
           ports:
             - containerPort: 80
           resources:

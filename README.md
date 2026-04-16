@@ -95,5 +95,5 @@ After bootstrap, all apps in `argocd/applications/` are deployed automatically.
 ### Where to find these values
 
 - **AZURE_CLIENT_ID / TENANT_ID / SUBSCRIPTION_ID** — Azure Portal → Managed Identity `cloudzen-prod-mi` → Overview
-- **ACR_USERNAME / ACR_PASSWORD** — Azure Portal → ACR `cloudzen-prod-acr` → Access keys
+- **ACR_USERNAME / ACR_PASSWORD** — Azure Portal → ACR `cloudzenprodacr` → Access keys
 
