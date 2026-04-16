@@ -47,7 +47,13 @@ jobs:
             kubectl create namespace argocd
           fi
 
-          kubectl apply --server-side -n argocd \
+          APPLY_FLAGS="--server-side"
+          if kubectl get deployment argocd-server -n argocd >/dev/null 2>&1; then
+            echo "ArgoCD appears partially installed, using force-conflicts"
+            APPLY_FLAGS="$APPLY_FLAGS --force-conflicts"
+          fi
+
+          kubectl apply $APPLY_FLAGS -n argocd \
             -f https://raw.githubusercontent.com/argoproj/argo-cd/${{ env.ARGOCD_VERSION }}/manifests/install.yaml
 
           echo "Waiting for ArgoCD to be ready..."
