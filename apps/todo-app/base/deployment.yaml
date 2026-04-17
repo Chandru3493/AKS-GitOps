@@ -14,8 +14,15 @@ spec:
       labels:
         app: todo-app
     spec:
+      securityContext:
+        runAsUser: 101  # nginx user ID in alpine
+        runAsGroup: 101
+        fsGroup: 101
       containers:
         - name: todo-app
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
           image: cloudzenprodacr.azurecr.io/todo-app:latest
           ports:
             - containerPort: 80
