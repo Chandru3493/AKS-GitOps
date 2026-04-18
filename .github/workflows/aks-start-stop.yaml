@@ -73,11 +73,51 @@ jobs:
             echo "---------------------------------------------------"
 
             echo ""
-            echo "Deleting..."
+            echo "Deleting in dependency order..."
+
+            # 1. VMSS first (holds NIC references to NSG and LB)
             while IFS=$'\t' read -r NAME TYPE ID; do
-              echo "Deleting: $NAME ($TYPE)"
-              az resource delete --ids "$ID"
+              if [[ "$TYPE" == "Microsoft.Compute/virtualMachineScaleSets" ]]; then
+                echo "Deleting: $NAME ($TYPE)"
+                az resource delete --ids "$ID"
+              fi
             done <<< "$RESOURCES"
+
+            # 2. NSG (referenced by VMSS NICs)
+            while IFS=$'\t' read -r NAME TYPE ID; do
+              if [[ "$TYPE" == "Microsoft.Network/networkSecurityGroups" ]]; then
+                echo "Deleting: $NAME ($TYPE)"
+                az resource delete --ids "$ID"
+              fi
+            done <<< "$RESOURCES"
+
+            # 3. Load Balancer (references Public IPs as frontend)
+            while IFS=$'\t' read -r NAME TYPE ID; do
+              if [[ "$TYPE" == "Microsoft.Network/loadBalancers" ]]; then
+                echo "Deleting: $NAME ($TYPE)"
+                az resource delete --ids "$ID"
+              fi
+            done <<< "$RESOURCES"
+
+            # 4. Public IPs last (no longer referenced by LB)
+            while IFS=$'\t' read -r NAME TYPE ID; do
+              if [[ "$TYPE" == "Microsoft.Network/publicIPAddresses" ]]; then
+                echo "Deleting: $NAME ($TYPE)"
+                az resource delete --ids "$ID"
+              fi
+            done <<< "$RESOURCES"
+
+            # 5. Any remaining resources
+            while IFS=$'\t' read -r NAME TYPE ID; do
+              if [[ "$TYPE" != "Microsoft.Compute/virtualMachineScaleSets" && \
+                    "$TYPE" != "Microsoft.Network/networkSecurityGroups" && \
+                    "$TYPE" != "Microsoft.Network/loadBalancers" && \
+                    "$TYPE" != "Microsoft.Network/publicIPAddresses" ]]; then
+                echo "Deleting: $NAME ($TYPE)"
+                az resource delete --ids "$ID"
+              fi
+            done <<< "$RESOURCES"
+
             echo "Cleanup complete."
           fi
 
