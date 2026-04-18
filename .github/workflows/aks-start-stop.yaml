@@ -19,6 +19,8 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
   RESOURCE_GROUP: cloudzen-prod-rg
   CLUSTER_NAME: cloudzen-prod-aks
+  MANAGED_RG: cloudzen-prod-aks-mrg
+  PRESERVE_IDENTITY: cloudzen-prod-aks-agentpool
 
 jobs:
   aks-cluster-action:
@@ -48,6 +50,23 @@ jobs:
             --resource-group ${{ env.RESOURCE_GROUP }} \
             --name ${{ env.CLUSTER_NAME }}
           echo "Cluster stopped successfully."
+
+      - name: Cleanup Managed Resource Group
+        if: ${{ github.event.inputs.action == 'stop' }}
+        run: |
+          echo "Fetching all resources in ${{ env.MANAGED_RG }} except ${{ env.PRESERVE_IDENTITY }}..."
+          RESOURCE_IDS=$(az resource list \
+            --resource-group ${{ env.MANAGED_RG }} \
+            --query "[?name!='${{ env.PRESERVE_IDENTITY }}'].id" \
+            -o tsv)
+
+          if [ -z "$RESOURCE_IDS" ]; then
+            echo "Nothing to delete."
+          else
+            echo "Deleting resources..."
+            echo "$RESOURCE_IDS" | xargs -I{} az resource delete --ids {} --verbose
+            echo "Cleanup complete."
+          fi
 
       - name: Verify Cluster State
         run: |
