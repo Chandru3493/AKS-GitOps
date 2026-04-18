@@ -47,15 +47,28 @@ jobs:
       - name: Cleanup Managed Resource Group
         run: |
           echo "Fetching all resources in ${{ env.MANAGED_RG }} except ${{ env.PRESERVE_IDENTITY }}..."
-          RESOURCE_IDS=$(az resource list \
+          RESOURCES=$(az resource list \
             --resource-group ${{ env.MANAGED_RG }} \
-            --query "[?name!='${{ env.PRESERVE_IDENTITY }}'].id" \
+            --query "[?name!='${{ env.PRESERVE_IDENTITY }}'].[name, type, id]" \
             -o tsv)
 
-          if [ -z "$RESOURCE_IDS" ]; then
+          if [ -z "$RESOURCES" ]; then
             echo "Nothing to delete."
           else
-            echo "Deleting resources..."
-            echo "$RESOURCE_IDS" | xargs -I{} az resource delete --ids {} --verbose
+            echo "Resources to be deleted:"
+            echo "---------------------------------------------------"
+            printf "%-45s %-50s\n" "NAME" "SERVICE TYPE"
+            echo "---------------------------------------------------"
+            while IFS=$'\t' read -r NAME TYPE ID; do
+              printf "%-45s %-50s\n" "$NAME" "$TYPE"
+            done <<< "$RESOURCES"
+            echo "---------------------------------------------------"
+
+            echo ""
+            echo "Deleting..."
+            while IFS=$'\t' read -r NAME TYPE ID; do
+              echo "Deleting: $NAME ($TYPE)"
+              az resource delete --ids "$ID"
+            done <<< "$RESOURCES"
             echo "Cleanup complete."
           fi
