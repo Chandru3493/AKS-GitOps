@@ -2,7 +2,7 @@ prometheus:
   enabled: false
   prometheusSpec:
     retention: 3d
-    externalUrl: "http://prometheus.system.cloudzen.me"
+    externalUrl: "http://prometheus.cloudzen.me"
     routePrefix: /
     resources:
       requests:
@@ -17,7 +17,7 @@ grafana:
   adminPassword: "changeme"
   grafana.ini:
     server:
-      root_url: "http://grafana.system.cloudzen.me"
+      root_url: "http://grafana.cloudzen.me"
 
 alertmanager:
   enabled: false

@@ -9,7 +9,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: argocd.system.cloudzen.me
+    - host: argocd.cloudzen.me
       http:
         paths:
           - path: /
