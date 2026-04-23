@@ -21,6 +21,11 @@ env:
   CLUSTER_NAME: cloudzen-prod-aks
   MANAGED_RG: cloudzen-prod-aks-mrg
   PRESERVE_IDENTITY: cloudzen-prod-aks-agentpool
+  CF_ZONE_ID: 178a2e26f8f84e9f5444b0c822a5ac3c
+  CF_RECORD_ROOT: 6b5e48674009070329a389d10a90e7ca
+  CF_RECORD_ARGOCD: 62e5577f4699ac356be03fbe0a0b5adf
+  CF_RECORD_GRAFANA: 708a81d3f47cd8e5190e9492e869b641
+  CF_RECORD_PROMETHEUS: e93ad2792d58146f68c85185bec35b44
 
 jobs:
   aks-cluster-action:
@@ -41,6 +46,56 @@ jobs:
             --resource-group ${{ env.RESOURCE_GROUP }} \
             --name ${{ env.CLUSTER_NAME }}
           echo "Cluster started successfully."
+
+      - name: Get kubeconfig
+        if: ${{ github.event.inputs.action == 'start' }}
+        run: |
+          az aks get-credentials \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --name ${{ env.CLUSTER_NAME }} \
+            --overwrite-existing
+
+      - name: Wait for nginx-ingress LB IP
+        if: ${{ github.event.inputs.action == 'start' }}
+        run: |
+          echo "Waiting for nginx-ingress LoadBalancer IP..."
+          for i in $(seq 1 30); do
+            LB_IP=$(kubectl get svc -n ingress-nginx ingress-nginx-controller \
+              -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null)
+            if [[ -n "$LB_IP" ]]; then
+              echo "LB IP: $LB_IP"
+              echo "LB_IP=$LB_IP" >> $GITHUB_ENV
+              break
+            fi
+            echo "Attempt $i/30 - waiting 10s..."
+            sleep 10
+          done
+          if [[ -z "$LB_IP" ]]; then
+            echo "Failed to get LB IP after 5 minutes."
+            exit 1
+          fi
+
+      - name: Update Cloudflare DNS Records
+        if: ${{ github.event.inputs.action == 'start' }}
+        run: |
+          echo "Updating Cloudflare DNS records to ${{ env.LB_IP }}..."
+
+          update_record() {
+            local RECORD_ID=$1
+            local NAME=$2
+            curl -s --request PATCH \
+              --url "https://api.cloudflare.com/client/v4/zones/${{ env.CF_ZONE_ID }}/dns_records/${RECORD_ID}" \
+              --header "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+              --header "Content-Type: application/json" \
+              --data "{\"content\":\"${{ env.LB_IP }}\"}" | grep -o '"success":[a-z]*'
+          }
+
+          echo "Updating cloudzen.me → $(update_record ${{ env.CF_RECORD_ROOT }} 'cloudzen.me')"
+          echo "Updating argocd.cloudzen.me → $(update_record ${{ env.CF_RECORD_ARGOCD }} 'argocd.cloudzen.me')"
+          echo "Updating grafana.cloudzen.me → $(update_record ${{ env.CF_RECORD_GRAFANA }} 'grafana.cloudzen.me')"
+          echo "Updating prometheus.cloudzen.me → $(update_record ${{ env.CF_RECORD_PROMETHEUS }} 'prometheus.cloudzen.me')"
+
+          echo "DNS update complete. All records now point to ${{ env.LB_IP }}"
 
       - name: Stop AKS Cluster
         if: ${{ github.event.inputs.action == 'stop' }}
