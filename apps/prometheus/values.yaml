@@ -13,7 +13,7 @@ prometheus:
         memory: 1Gi
 
 grafana:
-  enabled: true
+  enabled: false
   adminPassword: "changeme"
   grafana.ini:
     server:
