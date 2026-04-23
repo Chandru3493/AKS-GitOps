@@ -63,9 +63,10 @@ jobs:
         if: ${{ github.event.inputs.action == 'start' }}
         run: |
           echo "Waiting for nginx-ingress LoadBalancer IP..."
+          sleep 120
           for i in $(seq 1 30); do
             LB_IP=$(kubectl get svc -n ingress-nginx ingress-nginx-controller \
-              -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null)
+              -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null) || true
             if [[ -n "$LB_IP" ]]; then
               echo "LB IP: $LB_IP"
               echo "LB_IP=$LB_IP" >> $GITHUB_ENV
