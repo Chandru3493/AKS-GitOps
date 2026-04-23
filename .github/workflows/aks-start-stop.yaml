@@ -47,6 +47,10 @@ jobs:
             --name ${{ env.CLUSTER_NAME }}
           echo "Cluster started successfully."
 
+      - name: Install kubectl
+        if: ${{ github.event.inputs.action == 'start' }}
+        uses: azure/setup-kubectl@v4
+
       - name: Get kubeconfig
         if: ${{ github.event.inputs.action == 'start' }}
         run: |
