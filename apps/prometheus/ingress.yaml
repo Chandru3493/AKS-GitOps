@@ -8,10 +8,10 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: cloudzen.me
+    - host: prometheus.cloudzen.me
       http:
         paths:
-          - path: /prometheus
+          - path: /
             pathType: Prefix
             backend:
               service:
@@ -29,10 +29,10 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: cloudzen.me
+    - host: grafana.cloudzen.me
       http:
         paths:
-          - path: /grafana
+          - path: /
             pathType: Prefix
             backend:
               service:
