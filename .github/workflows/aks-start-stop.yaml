@@ -51,22 +51,27 @@ jobs:
         if: ${{ github.event.inputs.action == 'start' }}
         run: |
           echo "Waiting for nginx-ingress LoadBalancer IP..."
-          sleep 120
-          for i in $(seq 1 20); do
+          echo "--- Public IPs in ${{ env.MANAGED_RG }} ---"
+          az network public-ip list \
+            --resource-group ${{ env.MANAGED_RG }} \
+            --query "[].{name:name, ip:ipAddress}" \
+            -o table
+          echo "-------------------------------------------"
+          for i in $(seq 1 60); do
             LB_IP=$(az network public-ip list \
               --resource-group ${{ env.MANAGED_RG }} \
-              --query "[?ipAddress!=null].ipAddress | [0]" \
+              --query "[?starts_with(name, 'kubernetes-') && ipAddress!=null].ipAddress | [0]" \
               -o tsv 2>/dev/null)
             if [[ -n "$LB_IP" ]]; then
               echo "LB IP: $LB_IP"
               echo "LB_IP=$LB_IP" >> $GITHUB_ENV
               break
             fi
-            echo "Attempt $i/20 - no IP yet, waiting 30s..."
-            sleep 30
+            echo "Attempt $i/60 - no IP yet, waiting 15s..."
+            sleep 15
           done
           if [[ -z "$LB_IP" ]]; then
-            echo "Failed to get LB IP after 10 minutes."
+            echo "Failed to get LB IP after 15 minutes."
             exit 1
           fi
 
